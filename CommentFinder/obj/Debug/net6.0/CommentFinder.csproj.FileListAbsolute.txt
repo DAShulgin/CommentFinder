@@ -1,0 +1,15 @@
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\obj\Debug\net6.0\CommentFinder.csproj.AssemblyReference.cache
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\obj\Debug\net6.0\CommentFinder.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\obj\Debug\net6.0\CommentFinder.AssemblyInfoInputs.cache
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\obj\Debug\net6.0\CommentFinder.AssemblyInfo.cs
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\obj\Debug\net6.0\CommentFinder.csproj.CoreCompileInputs.cache
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\bin\Debug\net6.0\CommentFinder.exe
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\bin\Debug\net6.0\CommentFinder.deps.json
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\bin\Debug\net6.0\CommentFinder.runtimeconfig.json
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\bin\Debug\net6.0\CommentFinder.dll
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\bin\Debug\net6.0\CommentFinder.pdb
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\obj\Debug\net6.0\CommentFinder.dll
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\obj\Debug\net6.0\refint\CommentFinder.dll
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\obj\Debug\net6.0\CommentFinder.pdb
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\obj\Debug\net6.0\CommentFinder.genruntimeconfig.cache
+C:\Users\Denis\source\repos\CommentFinder\CommentFinder\obj\Debug\net6.0\ref\CommentFinder.dll

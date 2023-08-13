@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33712.159
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentFinder", "CommentFinder\CommentFinder.csproj", "{DC6092E6-9AC4-422F-AA01-2F36BABBA353}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC6092E6-9AC4-422F-AA01-2F36BABBA353}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC6092E6-9AC4-422F-AA01-2F36BABBA353}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC6092E6-9AC4-422F-AA01-2F36BABBA353}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC6092E6-9AC4-422F-AA01-2F36BABBA353}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {683C060C-9A24-4710-85D6-035E84512B1A}
+	EndGlobalSection
+EndGlobal
