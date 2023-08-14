@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 class CommentFinder
 {
@@ -130,9 +131,9 @@ class CommentFinder
             case 1:
                 SearchTextDirectory(extAsm, " asm"); break;
             case 2:
-                SearchTextDirectory(extLang, "Комментариев"); break;
+                SearchTextDirectory(extLang, "Сomment"); break;
             case 3:
-                Console.Write("Задайте текст для поиска:");
+                Console.Write("Set search text:");
                 CommentFinder.InputFindText = Console.ReadLine()!;
                 SearchTextDirectory(extLang, CommentFinder.InputFindText);
                 RepeatMenu();
@@ -146,35 +147,30 @@ class CommentFinder
                 Main();
                 break;
             case 6:
-                Console.Write("Введите путь к исходникам: ");
+                Console.Write("Enter source path: ");
                 CommentFinder.FileDirInput = Console.ReadLine()!;
                 Main();
                 break;
-            case 7:
-                AllFiles();
-                RepeatMenu();
-                break; 
             default:
-                Console.WriteLine("Error: Выберите значение из меню");
+                Console.WriteLine("Error: Select a value from the menu");
                 RepeatMenu();
                 break;
         }
 
         void ShowParametrWork()  // Оснвоное меню
         {
-            Console.WriteLine("Задайте Параметр для работы от 0 до 6: ");
+            Console.WriteLine("Set Parameter to work for 0 tо 6: ");
             Console.WriteLine();
-            Console.WriteLine(new string('!', 84));
-            Console.WriteLine("!! 0. Справка по работе программы                                                 !!");
-            Console.WriteLine("!! 1. Провести поиск асемблерных вставок в файлах с расширением [.c , .h]         !!");
-            Console.WriteLine("!! 2. Провести поиск комментов. В исходниках С/C++/C#/java/JavaScript/PHP/Go/Rust !!");
-            Console.WriteLine("!! 3. Поиск заданного текста. В исходниках С/C++/C#/java/JavaScript/PHP/Go/Rust   !!");
-            Console.WriteLine("!! 4. Очистить папку output                                                       !!");
-            Console.WriteLine("!! 5. Задать кодировку для файла                                                  !!");
-            Console.WriteLine("!! 6. Задать путь к исходникам                                                    !!");
-            Console.WriteLine("!! 7. Получить все расширения файлов в папке                                      !!");        
-            Console.WriteLine(new string('!', 84));
-            Console.WriteLine(CommentFinder.EncodeDefault.EncodingName);
+            Console.WriteLine(new string('!', 47));
+            Console.WriteLine("!! 0. Help for the program                   !!");
+            Console.WriteLine("!! 1. Search for assembler inserts [.c , .h] !!");
+            Console.WriteLine("!! 2. Search for comments in the source      !!");
+            Console.WriteLine("!! 3. Search for text in sources             !!");
+            Console.WriteLine("!! 4. Clear output folder                    !!");
+            Console.WriteLine("!! 5. Set encoding                           !!");
+            Console.WriteLine("!! 6. Set source path                        !!");  
+            Console.WriteLine(new string('!', 47));
+            Console.WriteLine(new string(' ', 25) + CommentFinder.EncodeDefault.EncodingName );
             Console.WriteLine();
         }
 
@@ -190,34 +186,35 @@ class CommentFinder
             Console.WriteLine("!! Go/Kotlin/PHP/Python/Rust" + new string(' ', 84) + "!!");
             Console.WriteLine("!! PL/SQL" + new string(' ', 103) + "!!");
             Console.WriteLine("!! Delphi/Object Pascal" + new string(' ', 89) + "!!");
-            Console.Write("!!" + new string(' ', 85) + "CommentFinder Версия 2.8 !!\n");
+            Console.Write("!!" + new string(' ', 85) + "CommentFinder Version 2.8!!\n");
             Console.WriteLine(new string('!', 114));
             Console.WriteLine();
         }
 
         void EncodingInputMenu() // меню выбора кодировки
         {
-            Console.WriteLine(new string("1. UTF8 || Info: по умолчанию"));
+            Console.WriteLine(new string("1. Info: UTF8 - default"));
             Console.WriteLine(new string("2. Win1251"));
   
             if (CheckForNumber() > 2)
             {
-                Console.WriteLine("INFO: Задайте знчаение из меню");
+                Console.WriteLine("Info: Set value from menu");
                 CheckForNumber();             
             }
             else
             {
                 CommentFinder.EncodingState = CommentFinder.ParametrWork;
-                Console.WriteLine("Кодировка устакновлена");
                 EncodeDefault();
             }
 
             switch (CommentFinder.EncodingState)
             {
                 case 1:
-                    Console.WriteLine("Info: " + CommentFinder.EncodeDefault.EncodingName ); break;
+                    Console.WriteLine("Encoding set: " + CommentFinder.EncodeDefault.EncodingName ); 
+                    Console.WriteLine(); break;
                 case 2:
-                    Console.WriteLine("Info: " + CommentFinder.EncodeDefault.EncodingName); break;
+                    Console.WriteLine("Encoding set: " + CommentFinder.EncodeDefault.EncodingName); 
+                    Console.WriteLine(); break;
             }
         }
 
@@ -242,15 +239,16 @@ class CommentFinder
                     {
                         dir.Delete(true);
                     }
-                    Console.WriteLine("Info: Папка output Очищена ");
+                    Console.WriteLine("Info: output folder Cleaned up");
+                    Console.WriteLine();
                     Main();
                 }
-                else { Console.WriteLine("Info:Папка Пуста"); }
+                else { Console.WriteLine("Info: Folder is empty"); }
             }
             catch (DirectoryNotFoundException dirEx)
             {
                 Console.WriteLine("Directory not found: " + dirEx.Message);
-                Console.WriteLine("Будет создана папки output");
+                Console.WriteLine("output folder will be created");
                 Directory.CreateDirectory(CommentFinder.FileDirOutput);
                 RepeatMenu();
             }
@@ -274,7 +272,7 @@ class CommentFinder
 
         int RepeatMenu() // повтор работы
         {
-            Console.WriteLine("\nДля выхода в Главное Меню =>  1, для Закрытия Программы => 0");
+            Console.WriteLine("\nTo exit to the Main Menu =>  1, to close the program => 0");
             CheckForNumber();
 
             if (CommentFinder.ParametrWork == 1)
@@ -282,7 +280,7 @@ class CommentFinder
             if (CommentFinder.ParametrWork == 0) return 0;
             if (CommentFinder.ParametrWork >= 2)
             {
-                Console.WriteLine("Вы ввели значение больше 1, будет выполнен возврат в меню");
+                Console.WriteLine("Info: You entered a value < 1, return to the menu");
                 Console.WriteLine();
                 Main();
             }
@@ -293,13 +291,13 @@ class CommentFinder
         {
             int number;
 
-            Console.Write("Жду ввода команды ==> ");
+            Console.Write("Waiting for a command ==> ");
             bool result = int.TryParse(Console.ReadLine(), out number);
             if (result == true)
                 CommentFinder.ParametrWork = number;
             else
             {
-                Console.WriteLine("Вы ввели не число");
+                Console.WriteLine("You didn't enter a number");
                 RepeatMenu();
             }
 
@@ -312,7 +310,8 @@ class CommentFinder
 
             bool findResult = false;
             int countFind = 0; // счетчик найденых файлов
-            var resultFindFiles = new List<string>(); // Список для записи всех файлов в котрых найден текст                    
+            var resultFindFiles = new List<string>(); // Список для записи всех файлов в котрых найден текст
+            var FindALLFindExtDir = new List<string>();   // Список расширений в директории
             var findExtentionDict = new Dictionary<int, ExtentionStats[]>(); //Словарь для всех найденных раширений исходников
             var resultScanTry = new List<string>(); // Список для записи найденных комментов/текста
             int dictionaryKey = 0; // key для словаря
@@ -323,6 +322,22 @@ class CommentFinder
             {
                 if (Directory.EnumerateFiles(CommentFinder.FileDirInput, "*.*", SearchOption.AllDirectories).Any())
                 {
+                    var extensionCounts = directory.EnumerateFiles("*.*", SearchOption.AllDirectories)
+                              .GroupBy(x => x.Extension)
+                              .Select(g => new { Extension = g.Key, Count = g.Count() })
+                              .ToList();
+                    FindALLFindExtDir.Add("Total File  found in directory: " + directory.GetFiles("*.*", SearchOption.AllDirectories).Length);
+                    FindALLFindExtDir.Add("Total Extention All found in directory: " + extensionCounts.Count);
+
+                    foreach (var group in extensionCounts)
+                    {
+                        FindALLFindExtDir.Add($"Search {group.Count} extension file {group.Extension}");
+                    }
+
+                    Console.WriteLine();
+                    Console.WriteLine("Info: Searching for text in sources ==>");
+                    Console.WriteLine();
+
                     foreach (KeyValuePair<string, string> e in extentionLang)
                     {
                         FileInfo[] fi = directory.GetFiles(e.Key, SearchOption.AllDirectories);
@@ -338,7 +353,7 @@ class CommentFinder
                                 }});
 
                             Console.WriteLine(new string('=', 114));
-                            Console.WriteLine($"Найден(о) {fi.Length} Файл(ов) c расширением {e.Key}");
+                            Console.WriteLine($"Search {fi.Length} file with extension {e.Key}");
                             Console.WriteLine(new string('=', 114));
                         }
                         CommentFinder.FileScan += fi.Length;
@@ -350,16 +365,16 @@ class CommentFinder
 
                             if (CommentFinder.FileDirInput == "input") //если стандартная дириктория
                             {
-                                openLine = $"Открыт файл {fi[i].FullName.Remove(0, fi[i].FullName.IndexOf("input"))}  для анализа => "; //обрезаем путь к файлу до папки проекта input
+                                openLine = $"File opened {fi[i].FullName.Remove(0, fi[i].FullName.IndexOf("input"))}  for analysis => "; //обрезаем путь к файлу до папки проекта input
                             }
-                            else { openLine = $"Открыт файл {fi[i].FullName}  для анализа => "; } // выводим полностью путь до файла
+                            else { openLine = $"File opened {fi[i].FullName}  for analysis => "; } // выводим полностью путь до файла
 
                             Console.WriteLine(openLine);
                             resultScanTry.Add(openLine);
 
                             for (int k = 0; k < readText.Count(); k++)
                             {
-                                string saveLine = $"В строке {k} [ {readText[k]} ]";
+                                string saveLine = $"In line {k} [ {readText[k]} ]";
 
                                 switch (CommentFinder.ParametrWork)
                                 {
@@ -419,7 +434,7 @@ class CommentFinder
                             }
                             else
                             {
-                                string notResultLine = $"В файле {fi[i].Name} не обнаружено {findText}";
+                                string notResultLine = $"In file {fi[i].Name} not detected {findText}";
                                 Console.WriteLine(notResultLine);
                                 resultScanTry.Add(notResultLine);
                             }
@@ -427,34 +442,41 @@ class CommentFinder
                     }
 
                     Console.WriteLine();
-                    string resultLine = $"Из {CommentFinder.FileScan} Проверенн(ых) файл(ов) найден(о) {countFind} файл(ов) с содержанием  [{findText.ToUpper().Trim()}]";
+                    for (int f = 0; f < FindALLFindExtDir.Count; f++)
+                    {
+                        Console.WriteLine(FindALLFindExtDir[f]);
+                    }
+
+                    Console.WriteLine();
+                    string resultLine = $"In {CommentFinder.FileScan} Checked file found {countFind} with content [{findText.ToUpper().Trim()}]";
                     Console.WriteLine(resultLine);
                     Console.WriteLine();
+
 
                     foreach (KeyValuePair<int, ExtentionStats[]> e in findExtentionDict)
                     {
                         for (int i = 0; i < e.Value.Length; i++)
-                            Console.WriteLine($"Найден(о) {e.Value[0].Amount} Файл(ов) c расширением {e.Value[i].Extention}");
+                            Console.WriteLine($"Search {e.Value[0].Amount} File with extension {e.Value[i].Extention}");
                     }
 
                     Console.WriteLine();
-                    Console.WriteLine("Статистика по языкам:");
+                    Console.WriteLine("Statistics by language:");
              
-                    WritingToFile(findExtentionDict, resultScanTry, resultLine);
+                    WritingToFile(findExtentionDict, resultScanTry, resultLine, FindALLFindExtDir);
                     MatchCalc(findExtentionDict);
                     CommentFinder.FileScan = 0;
                     RepeatMenu();
                 }
                 else
                 {
-                    Console.WriteLine("Error: Папка input пуста, для работы нужно перекинуть исходники в папку");
+                    Console.WriteLine("ErrorInfo: The input folder is empty, to work you need to transfer the sources to the folder");
                     RepeatMenu();
                 }
             }
             catch (DirectoryNotFoundException dirEx)
             {
                 Console.WriteLine("Directory not found: " + dirEx.Message);
-                Console.WriteLine("Будет создана папки input/output, перезапустите");
+                Console.WriteLine("The input/output folders will be created, restart programm");
                 Directory.CreateDirectory(CommentFinder.FileDirInput);
                 Directory.CreateDirectory(CommentFinder.FileDirOutput);
                 RepeatMenu();
@@ -462,7 +484,7 @@ class CommentFinder
             return 0;
         }
 
-        void WritingToFile(Dictionary<int, ExtentionStats[]> findExtentionDict, List<string> resultScanTry, string resultLine)
+        void WritingToFile(Dictionary<int, ExtentionStats[]> findExtentionDict, List<string> resultScanTry, string resultLine, List<string> FindALLFindExtDir)
         {
             string dataStart = DateTime.Now.ToString("yy.MM.dd HH.mm.ss"); //задаем дату для имени отчета
             string filename = $"output\\output_{dataStart}.txt"; // имя отчета
@@ -471,17 +493,25 @@ class CommentFinder
             {
                 StreamWriter f = new StreamWriter(filename);
 
+                for (int fe = 0; fe < FindALLFindExtDir.Count; fe++)
+                {
+                    f.WriteLine(FindALLFindExtDir[fe]);
+                }
+                f.WriteLine();
+
                 f.WriteLine(resultLine);
                 f.WriteLine();
+
+                f.WriteLine("Search extension:");
 
                 foreach (KeyValuePair<int, ExtentionStats[]> e in findExtentionDict)
                 {
                     for (int i = 0; i < e.Value.Length; i++)
-                        f.WriteLine($"Найден(о) {e.Value[0].Amount} Файл(ов) c расширением {e.Value[i].Extention}");
+                        f.WriteLine($"Search {e.Value[0].Amount} File with extension {e.Value[i].Extention}");
                 }
 
                 f.WriteLine();
-                f.WriteLine("Статистика по языкам:");
+                f.WriteLine("Statistics by language:");
 
                 foreach (KeyValuePair<string, double> item in MatchCalc(findExtentionDict))
                 {
@@ -494,34 +524,13 @@ class CommentFinder
 
                 Console.WriteLine();
                 f.WriteLine();
-                Console.WriteLine("GenerateTxt: Отчет создан успешно. Находится в папке проекта output");
+                Console.WriteLine("GenerateTxt: The report was created successfully. Located in the project's output folder");
                 f.Close();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка сохранения файла: {ex.Message}");
+                Console.WriteLine($"ErrorInfo: { ex.Message}");
             }         
-        }
-
-        void AllFiles()
-        {
-            DirectoryInfo directory = new DirectoryInfo(CommentFinder.FileDirInput);
-
-            if (Directory.EnumerateFiles(CommentFinder.FileDirInput, "*.*", SearchOption.AllDirectories).Any())
-            {
-
-                var extensionCounts = directory.EnumerateFiles("*.*", SearchOption.AllDirectories)
-                                 .GroupBy(x => x.Extension)
-                                 .Select(g => new { Extension = g.Key, Count = g.Count() })
-                                 .ToList();
-
-                // Console.WriteLine("Всего найдено файлов директории: {1}", extensionCounts.Count);
-
-                foreach (var group in extensionCounts)
-                {
-                    Console.WriteLine("Найдено {0} расширений файлов {1}", group.Count, group.Extension);
-                }
-            }
         }
 
         Dictionary<string, double> MatchCalc(Dictionary<int, ExtentionStats[]> findExtentionDict)
@@ -574,7 +583,3 @@ class ExtentionStats
     public string Extention { get; set; }
 
 }
-
-
-
-
