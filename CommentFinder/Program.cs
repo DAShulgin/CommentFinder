@@ -4,16 +4,17 @@ using System.Text.RegularExpressions;
 class CommentFinder
 {
     //Дефолтные директории в проекте
-    private string _fileDirInput = "input";
-    private string _fileDirOutput = "output";
+    private static string _fileDirInput = "input";
+    private static string _fileDirOutput = "output";
 
     private string _inputFindText = "text"; // Текст для поиска
 
     private int _parametrWork = 0; //Параметр для меню
-    private int _encodingState = 1; //Параметр по умолчанию меню кодировки
+    private static int _encodingState = 1; //Параметр по умолчанию для меню кодировки
+    private static Encoding _encodeDefault = Encoding.UTF8;
     private int _fileScan = 0; //счетчик открытых файлов для сканирования
 
-    static Regex regex = new Regex(@"^*\/\/.*?$|\/\*.*?\*\/"); // регулярка для Поиска одно/много - строчных комментриев
+    static Regex regex = new Regex(@"^*\/\/.*?$|\/\*.*?\*\/|--"); //one (//, --) and multilne comments  (/* text */)
     private string FileDirInput
     {
         get { return _fileDirInput; }
@@ -34,6 +35,11 @@ class CommentFinder
         get { return _encodingState; }
         set { _encodingState = value; }
     }
+    private Encoding EncodeDefault
+    {
+       get { return _encodeDefault; }
+       set { _encodeDefault = value; }
+    }
     private int FileScan
     {
         get { return _fileScan; }
@@ -43,12 +49,6 @@ class CommentFinder
     {
         get { return _inputFindText; }
         set { _inputFindText = value; }
-    }
-    class ExtentionStats
-    {
-        public int Amount { get; set; }
-        public string Extention { get; set; }
-
     }
 
     static Dictionary<string, string> extAsm = new Dictionary<string, string>
@@ -69,6 +69,7 @@ class CommentFinder
         ["*.cjs"] = "JavaScript",
         ["*.mjs"] = "JavaScript",
         ["*.es"] = "ECMAScript",
+        ["*.ts"] = "TypeScript",
         ["*.css"] = "CSS",
         ["*.h"] = "C",
         ["*.c"] = "C",
@@ -102,7 +103,8 @@ class CommentFinder
         ["*.pyd"] = "Python",
         ["*.pyw"] = "Python",
         ["*.pyz"] = "Python",
-        ["*.pyo"] = "Python"
+        ["*.pyo"] = "Python",
+        ["*.sql"] = "SQL"
     };
     private static void Main()
     {
@@ -142,6 +144,10 @@ class CommentFinder
                 CommentFinder.FileDirInput = Console.ReadLine()!;
                 Main();
                 break;
+            case 7:
+                AllFiles();
+                RepeatMenu();
+                break; 
             default:
                 Console.WriteLine("Error: Выберите значение из меню");
                 RepeatMenu();
@@ -160,6 +166,8 @@ class CommentFinder
             Console.WriteLine("!! 4. Очистить папку output                                                       !!");
             Console.WriteLine("!! 5. Задать кодировку для файла                                                  !!");
             Console.WriteLine("!! 6. Задать путь к исходникам                                                    !!");
+            Console.WriteLine("!! 7. Получить все расширения файлов в папке                                      !!");
+            Console.WriteLine("!! Состояние кодировки: ["+ CommentFinder.EncodeDefault.EncodingName +"]" + new string(' ', 41) + "!!");
             Console.WriteLine(new string('!', 84));
             Console.WriteLine();
         }
@@ -170,6 +178,11 @@ class CommentFinder
             Console.Write("!! 1. Исходники перенести в папку проекта input или задать новый путь в меню." + new string(' ', 35) + "!!\n");
             Console.Write("!! 2. Выбрать один из режимов работы, отчет будет сгенерирован в папке output." + new string(' ', 34) + "!!\n");
             Console.Write("!! 3. Для работы требуется версия  NET Framework не ниже 6.0." + new string(' ', 51) + "!!\n");
+            Console.WriteLine("!! 4. Работает с исходниками ЯП:" + new string(' ', 80) + "!!");
+            Console.WriteLine("!! C/C++/C#/Java" + new string(' ', 96) + "!!");
+            Console.WriteLine("!! CSS/ECMAScript/JavaScript" + new string(' ', 84) + "!!");
+            Console.WriteLine("!! Go /Kotlin/PHP/Python/Rust" + new string(' ', 83) + "!!");
+            Console.WriteLine("!! PL /SQL" + new string(' ', 102) + "!!");
             Console.Write("!!" + new string(' ', 87) + "AsmFinder Версия 2.1.0 !!\n");
             Console.WriteLine(new string('!', 114));
             Console.WriteLine();
@@ -177,9 +190,28 @@ class CommentFinder
 
         void EncodingInputMenu() // меню выбора кодировки
         {
-            Console.WriteLine(new string("1. UTF8 || по умолчанию стоит"));
-            Console.WriteLine(new string("2. win1251"));
-            CheckForNumber();
+            Console.WriteLine(new string("1. UTF8 || Info: по умолчанию"));
+            Console.WriteLine(new string("2. Win1251"));
+  
+            if (CheckForNumber() > 2)
+            {
+                Console.WriteLine("INFO: Задайте знчаение из меню");
+                CheckForNumber();             
+            }
+            else
+            {
+                CommentFinder.EncodingState = CommentFinder.ParametrWork;
+                Console.WriteLine("Кодировка устакновлена");
+                EncodeDefault();
+            }
+
+            switch (CommentFinder.EncodingState)
+            {
+                case 1:
+                    Console.WriteLine("Info: " + CommentFinder.EncodeDefault.EncodingName ); break;
+                case 2:
+                    Console.WriteLine("Info: " + CommentFinder.EncodeDefault.EncodingName); break;
+            }
         }
 
         void CreateFolderWork(string path) //Создание директории
@@ -219,20 +251,18 @@ class CommentFinder
 
         Encoding EncodeDefault()
         {
-            Encoding encodeDefault = Encoding.UTF8;
-
             switch (CommentFinder.EncodingState)
             {
                 case 1:
-                    encodeDefault = Encoding.UTF8;
+                    CommentFinder.EncodeDefault = Encoding.UTF8;
                     break;
                 case 2:
                     Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-                    encodeDefault = Encoding.GetEncoding(1251);
+                    CommentFinder.EncodeDefault = Encoding.GetEncoding(1251);
                     break;
             }
 
-            return encodeDefault;
+            return CommentFinder.EncodeDefault;
         }
 
         int RepeatMenu() // повтор работы
@@ -252,7 +282,7 @@ class CommentFinder
             return 0;
         }
 
-        void CheckForNumber() //Проверка введенного значения на int для меню
+        int CheckForNumber() //Проверка введенного значения на int для меню
         {
             int number;
 
@@ -265,6 +295,8 @@ class CommentFinder
                 Console.WriteLine("Вы ввели не число");
                 RepeatMenu();
             }
+
+            return number;
         }
 
         int SearchTextDirectory(Dictionary<string, string> extentionLang, string findText)
@@ -438,6 +470,27 @@ class CommentFinder
             catch (Exception ex)
             {
                 Console.WriteLine($"Ошибка сохранения файла: {ex.Message}");
+            }         
+        }
+
+        void AllFiles()
+        {
+            DirectoryInfo directory = new DirectoryInfo(CommentFinder.FileDirInput);
+
+            if (Directory.EnumerateFiles(CommentFinder.FileDirInput, "*.*", SearchOption.AllDirectories).Any())
+            {
+
+                var extensionCounts = directory.EnumerateFiles("*.*", SearchOption.AllDirectories)
+                                 .GroupBy(x => x.Extension)
+                                 .Select(g => new { Extension = g.Key, Count = g.Count() })
+                                 .ToList();
+
+                // Console.WriteLine("Всего найдено файлов директории: {1}", extensionCounts.Count);
+
+                foreach (var group in extensionCounts)
+                {
+                    Console.WriteLine("Найдено {0} расширений файлов {1}", group.Count, group.Extension);
+                }
             }
         }
 
@@ -473,7 +526,7 @@ class CommentFinder
                 }
             }
 
-            foreach (KeyValuePair<string, double> item in grouped)
+            foreach (KeyValuePair<string, double> item in grouped) // считаем статистику в %
             {
                 double calc = (Convert.ToDouble(item.Value) / Convert.ToDouble(CommentFinder.FileScan)) * 100;
                 calc = Math.Round(calc, 2, MidpointRounding.AwayFromZero);
@@ -484,6 +537,13 @@ class CommentFinder
             return grouped;
         }
     }
+}
+
+class ExtentionStats
+{
+    public int Amount { get; set; }
+    public string Extention { get; set; }
+
 }
 
 

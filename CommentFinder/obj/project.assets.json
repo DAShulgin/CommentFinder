@@ -8,19 +8,19 @@
     "net6.0": []
   },
   "packageFolders": {
-    "C:\\Users\\Denis\\.nuget\\packages\\": {}
+    "C:\\Users\\Fuzzer1\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Denis\\source\\repos\\CommentFinder\\CommentFinder\\CommentFinder.csproj",
+      "projectUniqueName": "C:\\Users\\Fuzzer1\\source\\repos\\CommentFinder\\CommentFinder\\CommentFinder.csproj",
       "projectName": "CommentFinder",
-      "projectPath": "C:\\Users\\Denis\\source\\repos\\CommentFinder\\CommentFinder\\CommentFinder.csproj",
-      "packagesPath": "C:\\Users\\Denis\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Denis\\source\\repos\\CommentFinder\\CommentFinder\\obj\\",
+      "projectPath": "C:\\Users\\Fuzzer1\\source\\repos\\CommentFinder\\CommentFinder\\CommentFinder.csproj",
+      "packagesPath": "C:\\Users\\Fuzzer1\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Fuzzer1\\source\\repos\\CommentFinder\\CommentFinder\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Denis\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Fuzzer1\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -61,7 +61,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
       }
     }
   }
