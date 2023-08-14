@@ -14,7 +14,10 @@ class CommentFinder
     private static Encoding _encodeDefault = Encoding.UTF8;
     private int _fileScan = 0; //счетчик открытых файлов для сканирования
 
-    static Regex regex = new Regex(@"^*\/\/.*?$|\/\*.*?\*\/|--"); //one (//, --) and multilne comments  (/* text */)
+    static Regex regexCommentsAll = new Regex(@"^*\/\/.*?$|\/\*.*?\*\/"); //one // and multilne comments  /* text */
+    static Regex regexCommentsSQL = new Regex(@"^*\/\*.*?\*\/|--"); //one -- and multilne comments SQL /* text */
+    static Regex regexDelphiComments = new Regex(@"^*\/\/.*?$|\/{.*?\}/");  // one // and multilne comments Delphi { text }
+
     private string FileDirInput
     {
         get { return _fileDirInput; }
@@ -104,7 +107,10 @@ class CommentFinder
         ["*.pyw"] = "Python",
         ["*.pyz"] = "Python",
         ["*.pyo"] = "Python",
-        ["*.sql"] = "SQL"
+        ["*.sql"] = "SQL",
+        ["*.p"] = "Delphi/Object Pascal",
+        ["*.pp"] = "Delphi/Object Pascal",
+        ["*.pas"] = "Delphi/Object Pascal"
     };
     private static void Main()
     {
@@ -166,9 +172,9 @@ class CommentFinder
             Console.WriteLine("!! 4. Очистить папку output                                                       !!");
             Console.WriteLine("!! 5. Задать кодировку для файла                                                  !!");
             Console.WriteLine("!! 6. Задать путь к исходникам                                                    !!");
-            Console.WriteLine("!! 7. Получить все расширения файлов в папке                                      !!");
-            Console.WriteLine("!! Состояние кодировки: ["+ CommentFinder.EncodeDefault.EncodingName +"]" + new string(' ', 41) + "!!");
+            Console.WriteLine("!! 7. Получить все расширения файлов в папке                                      !!");        
             Console.WriteLine(new string('!', 84));
+            Console.WriteLine(CommentFinder.EncodeDefault.EncodingName);
             Console.WriteLine();
         }
 
@@ -181,9 +187,10 @@ class CommentFinder
             Console.WriteLine("!! 4. Работает с исходниками ЯП:" + new string(' ', 80) + "!!");
             Console.WriteLine("!! C/C++/C#/Java" + new string(' ', 96) + "!!");
             Console.WriteLine("!! CSS/ECMAScript/JavaScript" + new string(' ', 84) + "!!");
-            Console.WriteLine("!! Go /Kotlin/PHP/Python/Rust" + new string(' ', 83) + "!!");
-            Console.WriteLine("!! PL /SQL" + new string(' ', 102) + "!!");
-            Console.Write("!!" + new string(' ', 87) + "AsmFinder Версия 2.1.0 !!\n");
+            Console.WriteLine("!! Go/Kotlin/PHP/Python/Rust" + new string(' ', 84) + "!!");
+            Console.WriteLine("!! PL/SQL" + new string(' ', 103) + "!!");
+            Console.WriteLine("!! Delphi/Object Pascal" + new string(' ', 89) + "!!");
+            Console.Write("!!" + new string(' ', 85) + "CommentFinder Версия 2.8 !!\n");
             Console.WriteLine(new string('!', 114));
             Console.WriteLine();
         }
@@ -365,11 +372,34 @@ class CommentFinder
                                         }
                                         break;
                                     case 2:
-                                        if (regex.IsMatch(readText[k]))
+                                        switch (e.Key)
                                         {
-                                            findResult = true;
-                                            Console.WriteLine(saveLine);
-                                            resultScanTry.Add(saveLine);
+                                            case "*.sql":
+                                                if (regexCommentsSQL.IsMatch(readText[k]))
+                                                {
+                                                    findResult = true;
+                                                    Console.WriteLine(saveLine);
+                                                    resultScanTry.Add(saveLine);
+                                                }
+                                                break;
+                                            case "*.p": 
+                                            case "*.pp":
+                                            case "*.pas":
+                                                   if (regexDelphiComments.IsMatch(readText[k]))
+                                                {
+                                                    findResult = true;
+                                                    Console.WriteLine(saveLine);
+                                                    resultScanTry.Add(saveLine);
+                                                }
+                                                   break;
+                                            default:
+                                                if (regexCommentsAll.IsMatch(readText[k]))
+                                                {
+                                                    findResult = true;
+                                                    Console.WriteLine(saveLine);
+                                                    resultScanTry.Add(saveLine);
+                                                }
+                                                break;
                                         }
                                         break;
                                     case 3:
@@ -538,7 +568,6 @@ class CommentFinder
         }
     }
 }
-
 class ExtentionStats
 {
     public int Amount { get; set; }
