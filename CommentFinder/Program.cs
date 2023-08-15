@@ -72,8 +72,11 @@ class CommentFinder
         ["*.js"] = "JavaScript",
         ["*.cjs"] = "JavaScript",
         ["*.mjs"] = "JavaScript",
-        ["*.es"] = "ECMAScript",
+        ["*.es"] = "JavaScript",
         ["*.ts"] = "TypeScript",
+        ["*.tsx"] = "TypeScript",
+        ["*.mts"] = "TypeScript",
+        ["*.cts"] = "TypeScript",
         ["*.css"] = "CSS",
         ["*.h"] = "C",
         ["*.c"] = "C",
@@ -176,18 +179,18 @@ class CommentFinder
 
         void HelpInfo() //меню помощи
         {
-            Console.WriteLine(new string('!', 114));
-            Console.Write("!! 1. Исходники перенести в папку проекта input или задать новый путь в меню." + new string(' ', 35) + "!!\n");
-            Console.Write("!! 2. Выбрать один из режимов работы, отчет будет сгенерирован в папке output." + new string(' ', 34) + "!!\n");
-            Console.Write("!! 3. Для работы требуется версия  NET Framework не ниже 6.0." + new string(' ', 51) + "!!\n");
-            Console.WriteLine("!! 4. Работает с исходниками ЯП:" + new string(' ', 80) + "!!");
-            Console.WriteLine("!! C/C++/C#/Java" + new string(' ', 96) + "!!");
-            Console.WriteLine("!! CSS/ECMAScript/JavaScript" + new string(' ', 84) + "!!");
-            Console.WriteLine("!! Go/Kotlin/PHP/Python/Rust" + new string(' ', 84) + "!!");
-            Console.WriteLine("!! PL/SQL" + new string(' ', 103) + "!!");
-            Console.WriteLine("!! Delphi/Object Pascal" + new string(' ', 89) + "!!");
-            Console.Write("!!" + new string(' ', 85) + "CommentFinder Version 2.8!!\n");
-            Console.WriteLine(new string('!', 114));
+            Console.WriteLine(new string('!', 82));
+            Console.Write("!! 1. Исходники перенести в папку проекта input или задать новый путь в меню." + new string(' ', 3) + "!!\n");
+            Console.Write("!! 2. Выбрать один из режимов работы, отчет будет сгенерирован в папке output." + new string(' ', 2) + "!!\n");
+            Console.Write("!! 3. Для работы требуется версия  NET Framework не ниже 6.0." + new string(' ', 19) + "!!\n");
+            Console.WriteLine("!! 4. Работает с исходниками ЯП:" + new string(' ', 48) + "!!");
+            Console.WriteLine("!! C/C++/C#/Java" + new string(' ', 64) + "!!");
+            Console.WriteLine("!! CSS/TypeScript/JavaScript" + new string(' ', 52) + "!!");
+            Console.WriteLine("!! Go/Kotlin/PHP/Python/Rust" + new string(' ', 52) + "!!");
+            Console.WriteLine("!! PL/SQL" + new string(' ', 71) + "!!");
+            Console.WriteLine("!! Delphi/Object Pascal" + new string(' ', 57) + "!!");
+            Console.Write("!!" + new string(' ', 53) + "CommentFinder Version 2.8!!\n");
+            Console.WriteLine(new string('!', 82));
             Console.WriteLine();
         }
 

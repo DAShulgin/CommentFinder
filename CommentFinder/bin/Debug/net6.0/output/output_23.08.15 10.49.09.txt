@@ -1,0 +1,58 @@
+Total File  found in directory: 5
+Total Extention All found in directory: 5
+Search 1 extension file .p
+Search 1 extension file .sql
+Search 1 extension file .cs
+Search 1 extension file .c
+Search 1 extension file .txt
+
+In 4 Checked file found 4 with content [СOMMENT]
+
+Search extension:
+Search 1 File with extension *.c
+Search 1 File with extension *.cs
+Search 1 File with extension *.sql
+Search 1 File with extension *.p
+
+Statistics by language:
+C : 25%
+C# : 25%
+SQL : 25%
+Delphi/Object Pascal : 25%
+
+File opened input\Program1.c  for analysis => 
+In line 0 [ // Test Comment 1 ]
+In line 1 [ //Test Comment 2 ]
+In line 2 [  //Test Comment 3 ]
+In line 3 [       //Test Comment 4 ]
+In line 4 [ //               Test Comment 5 ]
+In line 5 [ //   Test Comment 6 ]
+In line 6 [  //Test Comment 3 ]
+In line 7 [       //    Test Comment 7 ]
+In line 12 [  /* Test Comment 12 */ ]
+In line 13 [        /*Test Comment 13*/ ]
+In line 14 [ /*Test Comment 14*/ ]
+File opened input\Program.cs  for analysis => 
+In line 0 [ // Test Comment 1 ]
+In line 1 [ //Test Comment 2 ]
+In line 2 [  //Test Comment 3 ]
+In line 3 [       //Test Comment 4 ]
+In line 4 [ //               Test Comment 5 ]
+In line 5 [ //   Test Comment 6 ]
+In line 6 [  //Test Comment 3 ]
+In line 7 [       //    Test Comment 7 ]
+In line 12 [  /* Test Comment 12 */ ]
+In line 13 [        /*Test Comment 13*/ ]
+In line 14 [ /*Test Comment 14*/ ]
+File opened input\.sql  for analysis => 
+In line 0 [ <<label>>   -- this is optional ]
+In line 2 [ -- this section is optional ]
+In line 4 [   number2 number1%TYPE := 17;             -- value default ]
+In line 6 [   text2   DATE         := SYSDATE;        -- current date and time ]
+In line 8 [ -- this section is mandatory, must contain at least one executable statement ]
+In line 13 [  /* N.B. for loop variables in PL/SQL are new declarations, with scope only inside the loop */ ]
+In line 15 [ -- this section is optional ]
+File opened input\.p  for analysis => 
+In line 0 [ // ПРАВИЛЬНО:  ]
+In line 10 [ // НЕПРАВИЛЬНО: ]
+
