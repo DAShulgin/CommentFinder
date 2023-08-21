@@ -1,6 +1,6 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
 
 class CommentFinder
 {
@@ -119,9 +119,6 @@ class CommentFinder
     private static void Main()
     {
         CommentFinder CommentFinder = new CommentFinder();
-
-        CreateFolderWork(CommentFinder.FileDirInput);
-        CreateFolderWork(CommentFinder.FileDirOutput);
         ShowParametrWork();
         CheckForNumber();
 
@@ -151,9 +148,24 @@ class CommentFinder
                 break;
             case 6:
                 Console.Write("Enter source path: ");
-                CommentFinder.FileDirInput = Console.ReadLine()!;
-                Main();
-                break;
+                CommentFinder.FileDirInput = Console.ReadLine();
+
+                switch (CommentFinder.FileDirInput)
+                {
+                    case " ":
+                    case "":
+                        Console.WriteLine("Error: Source path not set");
+                        Console.WriteLine("Info: Source path set default");
+                        CommentFinder.FileDirInput = "input";
+                        Main();
+                        break;
+                    default:
+                        Console.WriteLine($"Info: Source path set: {CommentFinder.FileDirInput}");
+                        Main();
+                        break;
+                }
+                break;               
+             
             default:
                 Console.WriteLine("Error: Select a value from the menu");
                 RepeatMenu();
@@ -171,12 +183,16 @@ class CommentFinder
             Console.WriteLine("!! 3. Search for text in sources             !!");
             Console.WriteLine("!! 4. Clear output folder                    !!");
             Console.WriteLine("!! 5. Set encoding                           !!");
-            Console.WriteLine("!! 6. Set source path                        !!");  
+            Console.WriteLine("!! 6. Set source path                        !!");
             Console.WriteLine(new string('!', 47));
-            Console.WriteLine(new string(' ', 25) + CommentFinder.EncodeDefault.EncodingName );
+            Console.WriteLine(new string(' ', 25) + CommentFinder.EncodeDefault.EncodingName);
             Console.WriteLine();
+            if (!Directory.Exists(CommentFinder.FileDirInput))            
+                CreateFolderWork(CommentFinder.FileDirInput);
+            if (!Directory.Exists(CommentFinder.FileDirOutput))
+                CreateFolderWork(CommentFinder.FileDirOutput);
         }
-
+ 
         void HelpInfo() //меню помощи
         {
             Console.WriteLine(new string('!', 82));
@@ -358,6 +374,9 @@ class CommentFinder
                             Console.WriteLine(new string('=', 114));
                             Console.WriteLine($"Search {fi.Length} file with extension {e.Key}");
                             Console.WriteLine(new string('=', 114));
+                            resultScanTry.Add(new string('=', 114));
+                            resultScanTry.Add($"Search {fi.Length} file with extension {e.Key}");
+                            resultScanTry.Add(new string('=', 114));
                         }
                         CommentFinder.FileScan += fi.Length;
                         for (int i = 0; i < fi.Length; ++i)
