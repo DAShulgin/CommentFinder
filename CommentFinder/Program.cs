@@ -18,7 +18,9 @@ class CommentFinder
     static Regex regexCommentsAll = new Regex(@"^*\/\/.*?$|\/\*.*?\*\/"); //one // and multilne comments  /* text */
     static Regex regexCommentsSQL = new Regex(@"^*\/\*.*?\*\/|--"); //one -- and multilne comments SQL /* text */
     static Regex regexDelphiComments = new Regex(@"^*\/\/.*?$|\/{.*?\}/");  // one // and multilne comments Delphi { text }
+    static Regex regexHTMLComments = new Regex(@"^<!|<!-?|-->");  // HTML comments
 
+  
     private string FileDirInput
     {
         get { return _fileDirInput; }
@@ -57,7 +59,7 @@ class CommentFinder
 
     static Dictionary<string, string> extAsm = new Dictionary<string, string>
     {
-        ["*.c"] = "C",
+        [" *.c"] = "C",
         ["*.h"] = "C"
     };
     //Словарь расширений
@@ -77,7 +79,9 @@ class CommentFinder
         ["*.tsx"] = "TypeScript",
         ["*.mts"] = "TypeScript",
         ["*.cts"] = "TypeScript",
+        ["*.html"] = "HTML",
         ["*.css"] = "CSS",
+        ["*.scss"] = "CSS",       
         ["*.h"] = "C",
         ["*.c"] = "C",
         ["*.cs"] = "C#",
@@ -150,22 +154,20 @@ class CommentFinder
                 Console.Write("Enter source path: ");
                 CommentFinder.FileDirInput = Console.ReadLine();
 
-                switch (CommentFinder.FileDirInput)
+                if (String.IsNullOrWhiteSpace(CommentFinder.FileDirInput) == true)
                 {
-                    case " ":
-                    case "":
-                        Console.WriteLine("Error: Source path not set");
-                        Console.WriteLine("Info: Source path set default");
-                        CommentFinder.FileDirInput = "input";
-                        Main();
-                        break;
-                    default:
-                        Console.WriteLine($"Info: Source path set: {CommentFinder.FileDirInput}");
-                        Main();
-                        break;
+                    Console.WriteLine("This path is empty, set default directory");
+                    CommentFinder.FileDirInput = "input";
+                    Main();
                 }
-                break;               
-             
+                else
+                {
+                    Console.WriteLine($"Info: Source path set: {CommentFinder.FileDirInput}");
+                    Main();
+                    break;
+                }
+                break;
+                            
             default:
                 Console.WriteLine("Error: Select a value from the menu");
                 RepeatMenu();
@@ -185,12 +187,16 @@ class CommentFinder
             Console.WriteLine("!! 5. Set encoding                           !!");
             Console.WriteLine("!! 6. Set source path                        !!");
             Console.WriteLine(new string('!', 47));
-            Console.WriteLine(new string(' ', 25) + CommentFinder.EncodeDefault.EncodingName);
+            Console.WriteLine(new string(' ', 27) + CommentFinder.EncodeDefault.EncodingName);
             Console.WriteLine();
-            if (!Directory.Exists(CommentFinder.FileDirInput))            
-                CreateFolderWork(CommentFinder.FileDirInput);
-            if (!Directory.Exists(CommentFinder.FileDirOutput))
-                CreateFolderWork(CommentFinder.FileDirOutput);
+            Console.WriteLine("Source path: " + CommentFinder.FileDirInput);
+            Console.WriteLine();
+
+                //Проверка существуют ли дефолтные директории проекта
+                if (!Directory.Exists("input"))
+                    CreateFolderWork("input");
+                if (!Directory.Exists("output"))
+                    CreateFolderWork("output");
         }
  
         void HelpInfo() //меню помощи
@@ -201,11 +207,12 @@ class CommentFinder
             Console.Write("!! 3. Для работы требуется версия  NET Framework не ниже 6.0." + new string(' ', 19) + "!!\n");
             Console.WriteLine("!! 4. Работает с исходниками ЯП:" + new string(' ', 48) + "!!");
             Console.WriteLine("!! C/C++/C#/Java" + new string(' ', 64) + "!!");
-            Console.WriteLine("!! CSS/TypeScript/JavaScript" + new string(' ', 52) + "!!");
+            Console.WriteLine("!! TypeScript/JavaScript" + new string(' ', 56) + "!!");
+            Console.WriteLine("!! CSS/HTML/Sass" + new string(' ', 64) + "!!");
             Console.WriteLine("!! Go/Kotlin/PHP/Python/Rust" + new string(' ', 52) + "!!");
             Console.WriteLine("!! PL/SQL" + new string(' ', 71) + "!!");
             Console.WriteLine("!! Delphi/Object Pascal" + new string(' ', 57) + "!!");
-            Console.Write("!!" + new string(' ', 53) + "CommentFinder Version 2.8!!\n");
+            Console.Write("!!" + new string(' ', 51) + "CommentFinder Version 2.8.5!!\n");
             Console.WriteLine(new string('!', 82));
             Console.WriteLine();
         }
@@ -239,7 +246,8 @@ class CommentFinder
 
         void CreateFolderWork(string path) //Создание директории
         {
-            Directory.CreateDirectory(path);
+            try {  Directory.CreateDirectory(path); }
+            catch(Exception e) { Console.WriteLine(e.Message); }
         }
 
         void ClearDirOutput(string FolderPath) //очистка папки output
@@ -429,6 +437,14 @@ class CommentFinder
                                                     resultScanTry.Add(saveLine);
                                                 }
                                                    break;
+                                            case "*.html":
+                                                if (regexHTMLComments.IsMatch(readText[k]))
+                                                {
+                                                    findResult = true;
+                                                    Console.WriteLine(saveLine);
+                                                    resultScanTry.Add(saveLine);
+                                                }
+                                                break;
                                             default:
                                                 if (regexCommentsAll.IsMatch(readText[k]))
                                                 {
@@ -498,9 +514,6 @@ class CommentFinder
             catch (DirectoryNotFoundException dirEx)
             {
                 Console.WriteLine("Directory not found: " + dirEx.Message);
-                Console.WriteLine("The input/output folders will be created, restart programm");
-                Directory.CreateDirectory(CommentFinder.FileDirInput);
-                Directory.CreateDirectory(CommentFinder.FileDirOutput);
                 RepeatMenu();
             }
             return 0;
