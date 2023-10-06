@@ -15,12 +15,19 @@ class CommentFinder
     private static Encoding _encodeDefault = Encoding.UTF8;
     private int _fileScan = 0; //счетчик открытых файлов для сканирования
 
-    static Regex regexCommentsAll = new Regex(@"^*\/\/.*?$|\/\*.*?\*\/"); //one // and multilne comments  /* text */
+
+    static Regex lineComment = new Regex(@"^*\/\/.*?$"); // one comment
+    static Regex blockCommentOpen = new Regex(@"^*/\*"); // multilne comment Open 
+    static Regex blockCommentClose = new Regex(@"^*\*/"); // multilne comment Close
+
+    //static Regex regexCommentsAll = new Regex(@"^*\/\/.*?$|\*"); //one // and multilne comments Open /* text */
     static Regex regexCommentsSQL = new Regex(@"^*\/\*.*?\*\/|--"); //one -- and multilne comments SQL /* text */
     static Regex regexDelphiComments = new Regex(@"^*\/\/.*?$|\/{.*?\}/");  // one // and multilne comments Delphi { text }
     static Regex regexHTMLComments = new Regex(@"^<!|<!-?|-->");  // HTML comments
 
-  
+
+
+
     private string FileDirInput
     {
         get { return _fileDirInput; }
@@ -84,6 +91,7 @@ class CommentFinder
         ["*.scss"] = "CSS",       
         ["*.h"] = "C",
         ["*.c"] = "C",
+        ["*.d"] = "D",
         ["*.cs"] = "C#",
         ["*.csx"] = "C#",
         //["*.C"] = "C++",
@@ -404,7 +412,7 @@ class CommentFinder
 
                             for (int k = 0; k < readText.Count(); k++)
                             {
-                                string saveLine = $"In line {k} [ {readText[k]} ]";
+                                string saveLine = $"In line {k}  {readText[k]} ";
 
                                 switch (CommentFinder.ParametrWork)
                                 {
@@ -446,11 +454,31 @@ class CommentFinder
                                                 }
                                                 break;
                                             default:
-                                                if (regexCommentsAll.IsMatch(readText[k]))
+                                                if (lineComment.IsMatch(readText[k]))
                                                 {
                                                     findResult = true;
                                                     Console.WriteLine(saveLine);
                                                     resultScanTry.Add(saveLine);
+                                                }
+
+                                                    if (blockCommentOpen.IsMatch(readText[k]))
+                                                {
+                                                    findResult = true;
+
+                                                    for (int n = k; n < readText.Count(); n++)
+                                                    {
+                                                        if (blockCommentClose.IsMatch(readText[n]))
+                                                        {                                                          
+                                                            Console.WriteLine($"In line {n}  {readText[n]} ");
+                                                            resultScanTry.Add($"In line {n}  {readText[n]} ");                                                          
+                                                            break;
+                                                        }
+                                                        else {
+                                                            Console.WriteLine($"In line {n}  {readText[n]} ");
+                                                            resultScanTry.Add($"In line {n}  {readText[n]} ");
+                                                        };
+                                                    }
+                                                      
                                                 }
                                                 break;
                                         }
