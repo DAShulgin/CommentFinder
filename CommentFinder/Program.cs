@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
 class CommentFinder
@@ -14,19 +13,19 @@ class CommentFinder
     private static int _encodingState = 1; //Параметр по умолчанию для меню кодировки
     private static Encoding _encodeDefault = Encoding.UTF8;
     private int _fileScan = 0; //счетчик открытых файлов для сканирования
+    private int _matchFound = 0; //счетчик найденных совпадений
 
+    static string asm = @"asm(.)*[{|\(][\s\S]*?[}|\)]"; // Поиск асемблерных вставок
 
-    static Regex lineComment = new Regex(@"^*\/\/.*?$"); // one comment
-    static Regex blockCommentOpen = new Regex(@"^*/\*"); // multilne comment Open 
-    static Regex blockCommentClose = new Regex(@"^*\*/"); // multilne comment Close
+    static string lineComment = @"\/\/.*?$"; // one comment
+    static string lineCommentSQL = @"--.*?$"; // one comment SQL
 
-    //static Regex regexCommentsAll = new Regex(@"^*\/\/.*?$|\*"); //one // and multilne comments Open /* text */
-    static Regex regexCommentsSQL = new Regex(@"^*\/\*.*?\*\/|--"); //one -- and multilne comments SQL /* text */
-    static Regex regexDelphiComments = new Regex(@"^*\/\/.*?$|\/{.*?\}/");  // one // and multilne comments Delphi { text }
-    static Regex regexHTMLComments = new Regex(@"^<!|<!-?|-->");  // HTML comments
+    static string multiComment = @"\/\*[\s\S]*?\*\/"; // multilne comments
+    static string DelphiMultiComment = @"{[\s\S]*?}"; // multilne comments Delphi
 
+    static string HTMLComments = @"<!--.*|.*-->";  // HTML comments
 
-
+    static string link = @"(https?:\/\/)?([\w-]{1,32}\.[\w-]{1,32})[^\s@]*$";
 
     private string FileDirInput
     {
@@ -63,12 +62,12 @@ class CommentFinder
         get { return _inputFindText; }
         set { _inputFindText = value; }
     }
-
-    static Dictionary<string, string> extAsm = new Dictionary<string, string>
+    private int СountComment
     {
-        [" *.c"] = "C",
-        ["*.h"] = "C"
-    };
+        get { return _matchFound; }
+        set { _matchFound = value; }
+    }
+
     //Словарь расширений
     static Dictionary<string, string> extLang = new Dictionary<string, string>()
     {
@@ -141,13 +140,13 @@ class CommentFinder
                 RepeatMenu();
                 break;
             case 1:
-                SearchTextDirectory(extAsm, " asm"); break;
+                SearchTextDirectory(extLang); break;
             case 2:
-                SearchTextDirectory(extLang, "Сomment"); break;
+                SearchTextDirectory(extLang); break;
             case 3:
                 Console.Write("Set search text:");
                 CommentFinder.InputFindText = Console.ReadLine()!;
-                SearchTextDirectory(extLang, CommentFinder.InputFindText);
+                SearchTextDirectory(extLang);
                 RepeatMenu();
                 break;
             case 4:
@@ -175,7 +174,7 @@ class CommentFinder
                     break;
                 }
                 break;
-                            
+
             default:
                 Console.WriteLine("Error: Select a value from the menu");
                 RepeatMenu();
@@ -200,13 +199,13 @@ class CommentFinder
             Console.WriteLine("Source path: " + CommentFinder.FileDirInput);
             Console.WriteLine();
 
-                //Проверка существуют ли дефолтные директории проекта
-                if (!Directory.Exists("input"))
-                    CreateFolderWork("input");
-                if (!Directory.Exists("output"))
-                    CreateFolderWork("output");
+            //Проверка существуют ли дефолтные директории проекта
+            if (!Directory.Exists("input"))
+                CreateFolderWork("input");
+            if (!Directory.Exists("output"))
+                CreateFolderWork("output");
         }
- 
+
         void HelpInfo() //меню помощи
         {
             Console.WriteLine(new string('!', 82));
@@ -229,11 +228,11 @@ class CommentFinder
         {
             Console.WriteLine(new string("1. Info: UTF8 - default"));
             Console.WriteLine(new string("2. Win1251"));
-  
+
             if (CheckForNumber() > 2)
             {
                 Console.WriteLine("Info: Set value from menu");
-                CheckForNumber();             
+                CheckForNumber();
             }
             else
             {
@@ -244,18 +243,18 @@ class CommentFinder
             switch (CommentFinder.EncodingState)
             {
                 case 1:
-                    Console.WriteLine("Encoding set: " + CommentFinder.EncodeDefault.EncodingName ); 
+                    Console.WriteLine("Encoding set: " + CommentFinder.EncodeDefault.EncodingName);
                     Console.WriteLine(); break;
                 case 2:
-                    Console.WriteLine("Encoding set: " + CommentFinder.EncodeDefault.EncodingName); 
+                    Console.WriteLine("Encoding set: " + CommentFinder.EncodeDefault.EncodingName);
                     Console.WriteLine(); break;
             }
         }
 
         void CreateFolderWork(string path) //Создание директории
         {
-            try {  Directory.CreateDirectory(path); }
-            catch(Exception e) { Console.WriteLine(e.Message); }
+            try { Directory.CreateDirectory(path); }
+            catch (Exception e) { Console.WriteLine(e.Message); }
         }
 
         void ClearDirOutput(string FolderPath) //очистка папки output
@@ -339,17 +338,18 @@ class CommentFinder
             return number;
         }
 
-        int SearchTextDirectory(Dictionary<string, string> extentionLang, string findText)
+        int SearchTextDirectory(Dictionary<string, string> extentionLang)
         {
             ExtentionStats ex = new ExtentionStats();
 
-            bool findResult = false;
-            int countFind = 0; // счетчик найденых файлов
-            var resultFindFiles = new List<string>(); // Список для записи всех файлов в котрых найден текст
+            var resultFindFiles = new List<string>(); // Список для записи всех файлов в которых найден текст
+            string openFile = "";
             var FindALLFindExtDir = new List<string>();   // Список расширений в директории
             var findExtentionDict = new Dictionary<int, ExtentionStats[]>(); //Словарь для всех найденных раширений исходников
             var resultScanTry = new List<string>(); // Список для записи найденных комментов/текста
             int dictionaryKey = 0; // key для словаря
+            CommentFinder.СountComment = 0;
+            string findText = "";
 
             DirectoryInfo directory = new DirectoryInfo(CommentFinder.FileDirInput);
 
@@ -394,115 +394,63 @@ class CommentFinder
                             resultScanTry.Add($"Search {fi.Length} file with extension {e.Key}");
                             resultScanTry.Add(new string('=', 114));
                         }
+
                         CommentFinder.FileScan += fi.Length;
+
                         for (int i = 0; i < fi.Length; ++i)
                         {
-                            string[] readText = File.ReadAllLines(fi[i].ToString(), EncodeDefault());
-
-                            string openLine = "";
-
+                            string[] AllLines = File.ReadAllLines(fi[i].ToString(), EncodeDefault());  //открываем файл и считываем его по строке
+                             
                             if (CommentFinder.FileDirInput == "input") //если стандартная дириктория
                             {
-                                openLine = $"File opened {fi[i].FullName.Remove(0, fi[i].FullName.IndexOf("input"))}  for analysis => "; //обрезаем путь к файлу до папки проекта input
+                                openFile = $"Open check file ==> {fi[i].FullName.Remove(0, fi[i].FullName.IndexOf("input"))}"; //обрезаем путь к файлу до папки проекта input
                             }
-                            else { openLine = $"File opened {fi[i].FullName}  for analysis => "; } // выводим полностью путь до файла
+                            else { openFile = $"Open check file ==> {fi[i].FullName}"; } // выводим полностью путь до файла
 
-                            Console.WriteLine(openLine);
-                            resultScanTry.Add(openLine);
+                            Console.WriteLine(openFile);
+                            resultScanTry.Add(openFile);
 
-                            for (int k = 0; k < readText.Count(); k++)
-                            {
-                                string saveLine = $"In line {k}  {readText[k]} ";
+                            switch (CommentFinder.ParametrWork)
+                            {                     
+                                case 1:
+                                    switch (e.Key)
+                                    {
+                                        case "*.c":
+                                        case "*.h":
+                                    findText = "asm";
+                                    resultScanTry.AddRange(CommnentList(AllLines, asm, "NotPattern"));
+                                    break;
+                                    }
+                                   break;   
 
-                                switch (CommentFinder.ParametrWork)
-                                {
-                                    case 1:
-                                        if (readText[k].Contains(findText))
-                                        {
-                                            findResult = true;
-                                            Console.WriteLine(saveLine);
-                                            resultScanTry.Add(saveLine);
-                                        }
-                                        break;
                                     case 2:
+                                    {
+                                        findText = "comment";
                                         switch (e.Key)
                                         {
                                             case "*.sql":
-                                                if (regexCommentsSQL.IsMatch(readText[k]))
-                                                {
-                                                    findResult = true;
-                                                    Console.WriteLine(saveLine);
-                                                    resultScanTry.Add(saveLine);
-                                                }
+                                                resultScanTry.AddRange(CommnentList(AllLines, lineCommentSQL, multiComment));
                                                 break;
-                                            case "*.p": 
+                                            case "*.p":
                                             case "*.pp":
                                             case "*.pas":
-                                                   if (regexDelphiComments.IsMatch(readText[k]))
-                                                {
-                                                    findResult = true;
-                                                    Console.WriteLine(saveLine);
-                                                    resultScanTry.Add(saveLine);
-                                                }
-                                                   break;
+                                                resultScanTry.AddRange(CommnentList(AllLines, lineComment, DelphiMultiComment));
+                                                break;
                                             case "*.html":
-                                                if (regexHTMLComments.IsMatch(readText[k]))
-                                                {
-                                                    findResult = true;
-                                                    Console.WriteLine(saveLine);
-                                                    resultScanTry.Add(saveLine);
-                                                }
+                                                resultScanTry.AddRange(CommnentList(AllLines, "NotPattern", HTMLComments));
                                                 break;
                                             default:
-                                                if (lineComment.IsMatch(readText[k]))
-                                                {
-                                                    findResult = true;
-                                                    Console.WriteLine(saveLine);
-                                                    resultScanTry.Add(saveLine);
-                                                }
-
-                                                    if (blockCommentOpen.IsMatch(readText[k]))
-                                                {
-                                                    findResult = true;
-
-                                                    for (int n = k; n < readText.Count(); n++)
-                                                    {
-                                                        if (blockCommentClose.IsMatch(readText[n]))
-                                                        {                                                          
-                                                            Console.WriteLine($"In line {n}  {readText[n]} ");
-                                                            resultScanTry.Add($"In line {n}  {readText[n]} ");                                                          
-                                                            break;
-                                                        }
-                                                        else {
-                                                            Console.WriteLine($"In line {n}  {readText[n]} ");
-                                                            resultScanTry.Add($"In line {n}  {readText[n]} ");
-                                                        };
-                                                    }
-                                                      
-                                                }
+                                                resultScanTry.AddRange(CommnentList(AllLines, lineComment, multiComment));
                                                 break;
                                         }
+                                    }
                                         break;
+
                                     case 3:
-                                        if (readText[k].Contains(findText))
-                                        {
-                                            findResult = true;
-                                            Console.WriteLine(saveLine);
-                                            resultScanTry.Add(saveLine);
-                                        }
-                                        break;
-                                }
-                            }
-                            if (findResult == true)
-                            {
-                                findResult = false;
-                                countFind++;
-                            }
-                            else
-                            {
-                                string notResultLine = $"In file {fi[i].Name} not detected {findText}";
-                                Console.WriteLine(notResultLine);
-                                resultScanTry.Add(notResultLine);
+                                    findText = CommentFinder.InputFindText;
+                                    resultScanTry.AddRange(CommnentList(AllLines,  findText, "NotPattern"));
+                                    // FindText(AllLines, findText);
+                                    break;                               
                             }
                         }
                     }
@@ -514,7 +462,7 @@ class CommentFinder
                     }
 
                     Console.WriteLine();
-                    string resultLine = $"In {CommentFinder.FileScan} Checked file found {countFind} with content [{findText.ToUpper().Trim()}]";
+                    string resultLine = $"In {CommentFinder.FileScan} Checked file found {CommentFinder.СountComment} with content [{findText}]";
                     Console.WriteLine(resultLine);
                     Console.WriteLine();
 
@@ -528,7 +476,8 @@ class CommentFinder
                     Console.WriteLine();
                     Console.WriteLine("Statistics by language:");
              
-                    WritingToFile(findExtentionDict, resultScanTry, resultLine, FindALLFindExtDir);
+                    
+                    WritingToFile(findExtentionDict, resultScanTry, resultLine);
                     MatchCalc(findExtentionDict);
                     CommentFinder.FileScan = 0;
                     RepeatMenu();
@@ -547,7 +496,7 @@ class CommentFinder
             return 0;
         }
 
-        void WritingToFile(Dictionary<int, ExtentionStats[]> findExtentionDict, List<string> resultScanTry, string resultLine, List<string> FindALLFindExtDir)
+        void WritingToFile(Dictionary<int, ExtentionStats[]> findExtentionDict, List<string> resultScanTry, string resultLine)
         {
             string dataStart = DateTime.Now.ToString("yy.MM.dd HH.mm.ss"); //задаем дату для имени отчета
             string filename = $"output\\output_{dataStart}.txt"; // имя отчета
@@ -556,11 +505,6 @@ class CommentFinder
             {
                 StreamWriter f = new StreamWriter(filename);
 
-                for (int fe = 0; fe < FindALLFindExtDir.Count; fe++)
-                {
-                    f.WriteLine(FindALLFindExtDir[fe]);
-                }
-                f.WriteLine();
 
                 f.WriteLine(resultLine);
                 f.WriteLine();
@@ -638,7 +582,57 @@ class CommentFinder
 
             return grouped;
         }
-    }
+
+        List<string> CommnentList (string[] AllLines, string oneLine, string multiLine)
+        {
+            var resultScanTry = new List<string>();
+            bool Result = false;
+            string CompareText = "";
+            Regex LinkRegex = new Regex(link); 
+
+            for (int i = 0; i < AllLines.Length; i++) // Поиск одинарного комментария
+                {
+                if (oneLine != "NotPattern")
+                {
+                    Regex lineComment = new Regex(oneLine); // one comment
+
+                    if (lineComment.IsMatch(AllLines[i]))
+                    {
+                        if (!LinkRegex.IsMatch(AllLines[i]))
+                        { 
+                            Result = true;
+                            CommentFinder.СountComment++;
+                            Console.WriteLine(AllLines[i]);
+                            resultScanTry.Add(AllLines[i]);
+                        }
+                    }
+                }
+                CompareText += AllLines[i] + "\n"; // соединяем строки в сплошной текст
+             }
+            if (multiLine != "NotPattern")
+            {
+                Regex multiComment = new Regex(multiLine); //  multiComment
+                Match match = multiComment.Match(CompareText); // Поиск по регулярному выражения совпадений
+
+                while (match.Success)
+                {
+                    Result = true;
+                    CommentFinder.СountComment++;
+                    Console.WriteLine(match.Value);
+                    resultScanTry.Add(match.Value);
+                    // Переходим к следующему совпадению
+                    match = match.NextMatch();
+                }
+            }
+
+            if (Result == false)
+            {
+                resultScanTry.Add("No matches found in the file");
+                Console.WriteLine("No matches found in the file");
+            }
+            return resultScanTry;
+        }
+    }      
 }
 class ExtentionStats
 {
